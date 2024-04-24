@@ -76,6 +76,9 @@ shutdown() {
 	podman exec "${CONTAINER_NAME}" "/volume/scripts/stop.sh" || true
 	podman stop "${CONTAINER_NAME}"
 }
+address() {
+	lightning-cli 'getinfo' | jq '.address'
+}
 ####################
 common
 case ${1} in
@@ -84,7 +87,8 @@ case ${1} in
   down) shutdown ;;
   clean) clean ;;
   lightning-cli) lightning-cli "${2}" "${3}" ;;
+	address) address ;;
 	invoice) invoice "${2}" "${3}" ;;
   test) ;;
-  *) eprintln 'Usage: < build | up | down | lightning-cli | invoice | clean >' ;;
+  *) eprintln 'Usage: < build | up | down | address | lightning-cli | invoice | clean >' ;;
 esac
