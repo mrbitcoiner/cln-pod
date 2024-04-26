@@ -74,11 +74,43 @@ clean() {
 }
 shutdown() {
 	podman exec "${CONTAINER_NAME}" "/volume/scripts/stop.sh" || true
-	podman stop "${CONTAINER_NAME}"
+	podman stop "${CONTAINER_NAME}" || true
 }
 address() {
 	lightning-cli 'getinfo' | jq '.address'
 }
+mk_systemd() {
+	! [ -e "/etc/systemd/system/${CONTAINER_NAME}.service" ] \
+		|| eprintln "service ${CONTAINER_NAME} already exists
+"
+	local user="${USER}"
+	sudo bash -c "cat << EOF > /etc/systemd/system/${CONTAINER_NAME}.service
+[Unit]
+Description=CLN Pod
+After=network.target
+
+[Service]
+Environment=\"PATH=/usr/local/bin:/usr/bin:/bin:${PATH}\"
+User=${user}
+Type=forking
+ExecStart=/bin/bash -c \"cd ${PWD}/${RELDIR}; ./control.sh up\"
+ExecStop=/bin/bash -c \"cd ${PWD}/${RELDIR}; ./control.sh down\"
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+"
+	sudo systemctl enable "${CONTAINER_NAME}".service
+}
+rm_systemd() {
+	[ -e "/etc/systemd/system/${CONTAINER_NAME}.service" ] || return 0
+	sudo systemctl stop "${CONTAINER_NAME}".service || true
+	sudo systemctl disable "${CONTAINER_NAME}".service
+	sudo rm /etc/systemd/system/"${CONTAINER_NAME}".service
+}
+
 ####################
 common
 case ${1} in
@@ -89,6 +121,8 @@ case ${1} in
   lightning-cli) lightning-cli "${2}" "${3}" ;;
 	address) address ;;
 	invoice) invoice "${2}" "${3}" ;;
+	mk-systemd) mk_systemd ;;
+	rm-systemd) rm_systemd ;;
   test) ;;
-  *) eprintln 'Usage: < build | up | down | address | lightning-cli | invoice | clean >' ;;
+  *) eprintln 'Usage: < build | up | down | address | lightning-cli | invoice | mk-systemd | rm-systemd | clean >' ;;
 esac
