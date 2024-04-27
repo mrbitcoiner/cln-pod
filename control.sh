@@ -31,11 +31,11 @@ env_check() {
 }
 common() {
 	env_check
+	[ -e "${RELDIR}/volume/data" ] || mkdir -p "${RELDIR}/volume/data"
 	[ -e "${BITCOIN_CLI_PATH}" ] || eprintln "not found ${BITCOIN_CLI_PATH}"
 	[ -e "${RELDIR}/volume/data/bitcoin-cli" ] \
 		|| cp -a "${BITCOIN_CLI_PATH}" "${RELDIR}/volume/data/bitcoin-cli"
 	chmod +x "${RELDIR}"/volume/scripts/*.sh
-	[ -e "${RELDIR}/volume/data" ] || mkdir -p "${RELDIR}/volume/data"
 }
 build() {
 	podman build \
