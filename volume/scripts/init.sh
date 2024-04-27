@@ -93,7 +93,7 @@ max-concurrent-htlcs=${CLN_MAX_HTLC_INFLIGHT}
 ####################
 ## OTHER
 EOF
-	lightningd &
+	lightningd | tee -a /volume/data/lightning.log &
 	local lightningd_pid="${!}"
 	printf "${lightningd_pid}" > /volume/data/lightning.pid
 	while kill -0 ${lightningd_pid} 1>/dev/null 2>&1; do
