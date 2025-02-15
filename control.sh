@@ -3,7 +3,7 @@
 set -e
 ####################
 readonly RELDIR="$(dirname ${0})"
-readonly IMAGE_NAME="cln"
+readonly IMAGE_NAME="cln-v24.1"
 ####################
 eprintln() {
 	! [ -z "${1}" ] || eprintln 'eprintln: undefined message'
@@ -110,7 +110,6 @@ rm_systemd() {
 	sudo systemctl disable "${CONTAINER_NAME}".service
 	sudo rm /etc/systemd/system/"${CONTAINER_NAME}".service
 }
-
 ####################
 common
 case ${1} in
