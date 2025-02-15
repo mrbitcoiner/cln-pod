@@ -63,8 +63,7 @@ invoice() {
 	local description="${1}"
 	local satoshi="${2}"
 	local label="$(dd if=/dev/urandom bs=1 count=64 2>/dev/null | sha256sum | awk '{print $1}')"
-	local cmd="invoice -k msatoshi=\"${satoshi}sat\" label=\"${label}\" description=\"${description}\""
-	lightning-cli "invoice -k msatoshi=\"${satoshi}sat\" label=\"${label}\" description=\"${description}\""
+	lightning-cli "invoice -k amount_msat=\"${satoshi}sat\" label=\"${label}\" description=\"${description}\""
 }
 clean() {
 	printf 'are you sure? This will delete all container data (Y/n): '

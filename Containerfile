@@ -1,5 +1,8 @@
 FROM docker.io/library/debian:bookworm-slim
 ARG DEBIAN_FRONTEND=noninteractive
+ENV CLN_REPO='https://github.com/elementsproject/lightning'
+# v24.11.1
+ENV COMMIT_VERSION='e6398e5b9aa1d54b42fc61db2ac35558f8e4f38a' 
 RUN \
 	set -e; \
 	apt update; \
@@ -7,12 +10,7 @@ RUN \
   autoconf automake build-essential git libtool libgmp-dev libsqlite3-dev \
   python3 python3-pip net-tools zlib1g-dev libsodium-dev gettext \
   libevent-dev wget python3.11-venv pkg-config libpq-dev python3-dev \ 
-  libffi-dev jq
-ENV CLN_REPO='https://github.com/elementsproject/lightning'
-# v24.11.1
-ENV COMMIT_VERSION='e6398e5b9aa1d54b42fc61db2ac35558f8e4f38a' 
-RUN \
-	set -e; \
+  libffi-dev jq; \
 	git clone ${CLN_REPO} /lightning \
 	&& cd /lightning \
 	&& git checkout ${COMMIT_VERSION} \
