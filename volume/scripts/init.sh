@@ -63,7 +63,12 @@ cln_setup(){
 	if [ ${CLN_MAX_HTLC_SIZE_MSAT} -gt 0 ]; then
 		htlc_maximum_msat="htlc-maximum-msat=${CLN_MAX_HTLC_SIZE_MSAT}"
 	fi
-
+	local bitcoin_retry_timeout=""
+	local bitcoin_rpcclienttimeout=""
+	if ! [ -z "${BITCOIN_TIMEOUT}" ]; then
+		bitcoin_retry_timeout="bitcoin-retry-timeout=${BITCOIN_TIMEOUT}" 
+		bitcoin_rpcclienttimeout="bitcoin-rpcclienttimeout=${BITCOIN_TIMEOUT}" 
+	fi
 	cat << EOF > "${LN_DATADIR}/config"
 ####################
 ## NETWORK & INFO
@@ -80,6 +85,11 @@ ${proxy}
 ${always_use_proxy}
 
 ####################
+## BITCOIN 
+${bitcoin_retry_timeout}
+${bitcoin_rpcclienttimeout}
+
+####################
 ## PAYMENTS/ROUTING 
 wumbo
 min-capacity-sat=${CLN_MIN_CH_CAPACITY_SAT}
@@ -93,6 +103,8 @@ max-concurrent-htlcs=${CLN_MAX_HTLC_INFLIGHT}
 ####################
 ## OTHER
 EOF
+}
+cln_start() {
 	lightningd | tee -a /volume/data/lightning.log &
 	local lightningd_pid="${!}"
 	printf "${lightningd_pid}" > /volume/data/lightning.pid
@@ -103,7 +115,8 @@ EOF
 init() {
 	tor_setup
 	bitcoind_setup
-	cln_setup # will block
+	cln_setup
+	cln_start # will block
 }
 ####################
 init

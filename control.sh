@@ -28,6 +28,7 @@ env_check() {
 	! [ -z "${BITCOIN_RPC_PASSWORD}" ] || eprintln 'undefined env: BITCOIN_RPC_PASSWORD'
 	! [ -z "${BITCOIN_RPC_PORT}" ] || eprintln 'undefined env: BITCOIN_RPC_PORT'
 	! [ -z "${BITCOIN_RPC_HOSTNAME}" ] || eprintln 'undefined env: BITCOIN_RPC_HOSTNAME'
+	! [ -z "${BITCOIN_TIMEOUT}" ] || eprintln 'undefined env: BITCOIN_TIMEOUT'
 }
 common() {
 	env_check
